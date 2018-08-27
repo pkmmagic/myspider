@@ -98,6 +98,18 @@ def get_num_set(soup, s):
             r = re.findall(pattern, page['href'])
             if len(r) != 0:
                 s.add(r[0])
+
+
+def get_lib_write_new(LibPath, NewPath, subpage_url_num_set):
+    s = set()
+    open2add(LibPath, s)
+    diff = subpage_url_num_set.difference(s)
+    open2w(NewPath, list(diff))
+    s.update(diff)
+    open2w(LibPath, sorted(list(s)))
+    return len(diff)
+
+
 ##
 
 
@@ -128,8 +140,19 @@ def get_url(num, l, mainPage, headers):
     result = urllib.request.urlopen(req, timeout=45)
     soup2 = BeautifulSoup(result, 'html.parser')
     get_list(soup2, l)
-##
 
+
+def get_list(soup, l):
+    for img in soup.find_all('img'):
+        if (img.has_attr('src') and img['src'].startswith('http://')
+                and img['src'].find('uploadhouse') == -1
+                and img['src'].find('ggpht') == -1
+                and img['src'].find('static.flickr') == -1
+        ):
+            l.append(img['src'])
+
+
+##
 
 
 # part3
@@ -147,6 +170,7 @@ def download(start_index, master_list, censorPath):
                 print('download ' + master_list[i].split(',')[0] + ' failed: ' + str(e))
     return n
 
+
 def master2candidates(master_list, candidatesPath):
     n = 0
     for i in range(len(master_list)):
@@ -155,9 +179,9 @@ def master2candidates(master_list, candidatesPath):
             open2a(candidatesPath, l)
             n += 1
     return n
+
+
 ##
-
-
 
 
 # part4
@@ -178,21 +202,55 @@ def cross(outputPath, l1, l2):
                 final_list = l2[j].split(',')[1:]
                 myspider.open2a(outputPath, final_list)
     return n
-
-
 ##
 
 
 
+## part download
+def part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libIndex, pace):
+    try:
+        num_list = get_num_list(libPath)
+        num_list = sorted(num_list)[libIndex: (pace+libIndex)]
+        print('lib num list successfully get from %s' % libPath)
+    except Exception as e:
+        print(e)
+    try:
+        get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath)
+    except Exception as e:
+        print(e)
 
-def get_lib_write_new(LibPath, NewPath, subpage_url_num_set):
-    s = set()
-    open2add(LibPath, s)
-    diff = subpage_url_num_set.difference(s)
-    open2w(NewPath, list(diff))
-    s.update(diff)
-    open2w(LibPath, sorted(list(s)))
-    return len(diff)
+
+def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath):
+    error_list = []
+    for num in num_list:
+        try:
+            image_url_list = []
+            get_url(num, image_url_list, mainPage, headers)
+            print(str(len(num_list)-num_list.index(num)) + ' left')
+            n = 1
+            if len(image_url_list) > 5:
+                for url in image_url_list:
+                    download_1pic(downloadPath, num, str(n), url, headers)
+                    n += 1
+                print(num + ' done: ' + str(len(image_url_list)) + ' img added.')
+
+        except Exception as e:
+            error_list.append(num)
+            print('get %s failed' % num, e)
+    open2a(errorPath, error_list)
+
+
+
+def download_1pic(downloadPath, dirname, filename, html, headers):
+    if not os.path.exists(downloadPath + dirname):
+        os.makedirs(downloadPath + dirname)
+
+    with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
+        req = urllib.request.Request(html, headers=headers)
+        result = urllib.request.urlopen(req, timeout=15)
+        f.write(result.read())
+
+##
 
 
 def log(logPath, length, time_elapsed):
@@ -253,13 +311,3 @@ def open2a(path, l):
         i = str(i).strip('[').strip(']').strip('{').strip('}').replace("'", "").replace(' ', '')
         f.write(i + '\n')
     f.close()
-
-
-def get_list(soup, l):
-    for img in soup.find_all('img'):
-        if (img.has_attr('src') and img['src'].startswith('http://')
-                and img['src'].find('uploadhouse') == -1
-                and img['src'].find('ggpht') == -1
-                and img['src'].find('static.flickr') == -1
-        ):
-            l.append(img['src'])
