@@ -1,0 +1,5 @@
+PartA time log:
+Last Date:Thu Aug  9 10:45:21 2018
+Time used:0.84
+Counts:
+Average:
