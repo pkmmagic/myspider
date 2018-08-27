@@ -226,14 +226,12 @@ def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, err
         try:
             image_url_list = []
             get_url(num, image_url_list, mainPage, headers)
+            print(str(len(num_list)-num_list.index(num)) + ' left')
             n = 1
             if len(image_url_list) > 5:
                 for url in image_url_list:
-                    try:
-                        download_1pic(downloadPath, num, str(n), url, headers)
-                        n += 1
-                    except Exception as e:
-                        print('get_url_from_numlist_download.second for', e)
+                    download_1pic(downloadPath, num, str(n), url, headers)
+                    n += 1
                 print(num + ' done: ' + str(len(image_url_list)) + ' img added.')
 
         except Exception as e:
@@ -244,16 +242,13 @@ def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, err
 
 
 def download_1pic(downloadPath, dirname, filename, html, headers):
-    try:
-        if not os.path.exists(downloadPath + dirname):
-            os.makedirs(downloadPath + dirname)
+    if not os.path.exists(downloadPath + dirname):
+        os.makedirs(downloadPath + dirname)
 
-        with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-            req = urllib.request.Request(html, headers=headers)
-            result = urllib.request.urlopen(req, timeout=30)
-            f.write(result.read())
-    except Exception as e:
-        print('download_1pic ', e)
+    with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
+        req = urllib.request.Request(html, headers=headers)
+        result = urllib.request.urlopen(req, timeout=15)
+        f.write(result.read())
 
 ##
 
