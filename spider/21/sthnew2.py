@@ -7,10 +7,10 @@ headers = {
 # mainPage = 'love2048.com'
 mainPage = 'www.weiai2048.com'
 
-libPath = 'lib.txt'
-errorPath = 'error.txt'
-downloadPath = r'D:\a\\'
-libIndex = 0
+libPath = 'lib2.txt'
+errorPath = 'error2.txt'
+downloadPath = r'D:\a500\\'
+libIndex = 500
 pace = 500
 
 if __name__ == '__main__':

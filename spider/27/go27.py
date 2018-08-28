@@ -8,15 +8,17 @@ headers = {
 mainPage = 'www.weiai2048.com'
 
 section = 27
-start_index = 2
-pace = 10
+start_index = 42
+pace = 20
 
 censorPath = r'd:\censor27'
 
-list1 = os.listdir(censorPath)
+def clearcensorpath():
 
-for i in list1:
-    os.remove(censorPath+'\\'+i)
+    list1 = os.listdir(censorPath)
+
+    for i in list1:
+        os.remove(censorPath+'\\'+i)
 
 libPath, newPath = 'lib.txt', 'new.txt'
 
@@ -24,8 +26,8 @@ myspider.part_1_go(headers, mainPage, section, start_index, pace, libPath, newPa
 
 masterPath, logPath = 'master.txt', 'urllog.csv'
 
-myspider.part_2_go(headers, mainPage, newPath, masterPath, logPath)
+#myspider.part_2_go(headers, mainPage, newPath, masterPath, logPath)
 
 downloadLogPath = 'download.csv'
 
-myspider.part_3_go(masterPath, downloadLogPath, censorPath, 0)
+#myspider.part_3_go(masterPath, downloadLogPath, censorPath, 0)

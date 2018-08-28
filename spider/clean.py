@@ -1,6 +1,7 @@
 import os
 
-mainpath = r'H:\spider\w\\'
+#mainpath = r'H:\spider\w\\'
+mainpath = r'D:\censor21\\'
 
 def getpath(mainpath):
     l = []

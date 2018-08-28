@@ -11,12 +11,6 @@ section = 21
 start_index = 2
 pace = 10
 
-censorPath = r'd:\censor21'
-
-list1 = os.listdir(censorPath)
-
-for i in list1:
-    os.remove(censorPath+'\\'+i)
 
 libPath, newPath = 'lib.txt', 'new.txt'
 
@@ -24,8 +18,8 @@ myspider.part_1_go(headers, mainPage, section, start_index, pace, libPath, newPa
 
 masterPath, logPath = 'master.txt', 'urllog.csv'
 
-myspider.part_2_go(headers, mainPage, newPath, masterPath, logPath)
+#myspider.part_2_go(headers, mainPage, newPath, masterPath, logPath)
 
 downloadLogPath, censorPath = 'download.csv', r'd:\censor21'
 
-myspider.part_3_go(masterPath, downloadLogPath, censorPath, 0)
+#myspider.part_3_go(masterPath, downloadLogPath, censorPath, 0)

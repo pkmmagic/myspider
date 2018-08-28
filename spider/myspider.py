@@ -1,4 +1,4 @@
-import re, csv, requests, myspider, time, urllib.request, os
+import re, csv, requests, myspider, time, os
 from bs4 import BeautifulSoup
 
 
@@ -83,8 +83,8 @@ def subpage(headers, mainPage, section, index, pace):  # from index on get pace 
     for i in range(index, index + pace):
         try:
             url = 'http://' + mainPage + '/2048/thread.php?fid-' + str(section) + '-page-' + str(i) + '.html'
-            result = urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30)
-            soup = BeautifulSoup(result, 'html.parser')
+            result = requests.get(url, headers=headers)
+            soup = BeautifulSoup(result.text, 'html.parser')
             get_num_set(soup, s)
         except Exception as e:
             print(e)
@@ -136,13 +136,8 @@ def get_from_numlist(num_list, mainPage, headers):
 
 
 def get_url(num, l, mainPage, headers):
-    req = urllib.request.Request('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers)
-    result = urllib.request.urlopen(req, timeout=45)
-    soup2 = BeautifulSoup(result, 'html.parser')
-    get_list(soup2, l)
-
-
-def get_list(soup, l):
+    result = requests.get('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers)
+    soup = BeautifulSoup(result.text, 'html.parser')
     for img in soup.find_all('img'):
         if (img.has_attr('src') and img['src'].startswith('http://')
                 and img['src'].find('uploadhouse') == -1
@@ -208,16 +203,16 @@ def cross(outputPath, l1, l2):
 
 ## part download
 def part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libIndex, pace):
-    try:
-        num_list = get_num_list(libPath)
-        num_list = sorted(num_list)[libIndex: (pace+libIndex)]
-        print('lib num list successfully get from %s' % libPath)
-    except Exception as e:
-        print(e)
-    try:
-        get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath)
-    except Exception as e:
-        print(e)
+	try:
+		num_list = get_num_list(libPath)
+		num_list = sorted(num_list)[libIndex: (pace+libIndex)]
+		print('{} nums successfully get from {}'.format(str(pace), libPath))
+	except Exception as e:
+		print(e)
+	try:
+		get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath)
+	except Exception as e:
+		print(e)
 
 
 def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath):
@@ -242,14 +237,15 @@ def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, err
 
 
 def download_1pic(downloadPath, dirname, filename, html, headers):
-    if not os.path.exists(downloadPath + dirname):
-        os.makedirs(downloadPath + dirname)
+	try:
+		if not os.path.exists(downloadPath + dirname):
+			os.makedirs(downloadPath + dirname)
 
-    with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-        req = urllib.request.Request(html, headers=headers)
-        result = urllib.request.urlopen(req, timeout=15)
-        f.write(result.read())
-
+		with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
+			result = requests.get(html, headers=headers, timeout = 30)
+			f.write(result.content)
+	except:
+		pass
 ##
 
 
