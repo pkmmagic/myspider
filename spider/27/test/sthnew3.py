@@ -7,11 +7,11 @@ headers = {
 # mainPage = 'love2048.com'
 mainPage = 'www.weiai2048.com'
 
-libPath = 'lib.txt'
+libPath = 'lib2.txt'
 errorPath = 'error.txt'
-downloadPath = r'D:\a0\\'
-libIndex = 140
-pace = 60
+downloadPath = r'D:\a5001\\'
+libIndex = 559
+pace = 41
 
 if __name__ == '__main__':
     myspider.part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libIndex, pace)

@@ -216,24 +216,23 @@ def part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libInd
 
 
 def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath):
-	error_list = []
-	for num in num_list:
-		try:
-			image_url_list = []
-			get_url(num, image_url_list, mainPage, headers)
-			print(str(len(num_list)-num_list.index(num)) + ' left')
-			n = 1
-			if len(image_url_list) > 5:
-				for url in image_url_list:
-					download_1pic(downloadPath, num, str(n), url, headers)
-					n += 1
-				print(num + ' done: ' + str(len(image_url_list)) + ' img added.')
-			else:
-				print(len(image_url_list))
-		except Exception as e:
-			error_list.append(num)
-			print('get %s failed' % num, e)
-	open2a(errorPath, error_list)
+    error_list = []
+    for num in num_list:
+        try:
+            image_url_list = []
+            get_url(num, image_url_list, mainPage, headers)
+            print(str(len(num_list)-num_list.index(num)) + ' left')
+            n = 1
+            if len(image_url_list) > 5:
+                for url in image_url_list:
+                    download_1pic(downloadPath, num, str(n), url, headers)
+                    n += 1
+                print(num + ' done: ' + str(len(image_url_list)) + ' img added.')
+
+        except Exception as e:
+            error_list.append(num)
+            print('get %s failed' % num, e)
+    open2a(errorPath, error_list)
 
 
 
@@ -243,7 +242,7 @@ def download_1pic(downloadPath, dirname, filename, html, headers):
 			os.makedirs(downloadPath + dirname)
 
 		with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-			result = requests.get(html, headers=headers, timeout = 0.5)
+			result = requests.get(html, headers=headers, timeout = 2.5)
 			f.write(result.content)
 	except:
 		pass

@@ -136,7 +136,7 @@ def get_from_numlist(num_list, mainPage, headers):
 
 
 def get_url(num, l, mainPage, headers):
-    result = requests.get('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers)
+    result = requests.get('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers, timeout = 10)
     soup = BeautifulSoup(result.text, 'html.parser')
     for img in soup.find_all('img'):
         if (img.has_attr('src') and img['src'].startswith('http://')
@@ -242,7 +242,7 @@ def download_1pic(downloadPath, dirname, filename, html, headers):
 			os.makedirs(downloadPath + dirname)
 
 		with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-			result = requests.get(html, headers=headers, timeout = 30)
+			result = requests.get(html, headers=headers, timeout = 5)
 			f.write(result.content)
 	except:
 		pass

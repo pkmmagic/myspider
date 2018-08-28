@@ -1,4 +1,4 @@
-import myspider, os
+import myspider
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36',
@@ -7,11 +7,11 @@ headers = {
 # mainPage = 'love2048.com'
 mainPage = 'www.weiai2048.com'
 
-libPath = 'lib.txt'
+libPath = 'lib2.txt'
 errorPath = 'error.txt'
-downloadPath = 'H:\spider\download\\'
-libIndex = 500
-pace = 200
+downloadPath = r'D:\a500\\'
+libIndex = 5000
+pace = 100
 
 if __name__ == '__main__':
     myspider.part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libIndex, pace)
