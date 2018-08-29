@@ -267,12 +267,8 @@ def download_1pic(downloadPath, dirname, html, headers):
         pattern = '/*?([\w]*)\.'
         filename = re.findall(pattern, html)[-1]
         with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-            result = requests.get(html, headers=headers, timeout = 30)        
-            if result.text.find('</html>') == -1:
-                f.write(result.content)
-            else:
-                f.close()
-                os.remove(downloadPath + '{}\{}.jpg'.format(dirname, filename))
+            result = requests.get(html, headers=headers, timeout = 30)
+            f.write(result.content)
     except:
         pass
 ##

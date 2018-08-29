@@ -1,4 +1,5 @@
 import re, csv, requests, myspider, time, os
+import threading
 from bs4 import BeautifulSoup
 
 
@@ -136,7 +137,7 @@ def get_from_numlist(num_list, mainPage, headers):
 
 
 def get_url(num, l, mainPage, headers):
-    result = requests.get('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers)
+    result = requests.get('http://' + mainPage + '/2048/read.php?tid-' + num + '.html', headers=headers, timeout = 45)
     soup = BeautifulSoup(result.text, 'html.parser')
     for img in soup.find_all('img'):
         if (img.has_attr('src') and img['src'].startswith('http://')
@@ -203,16 +204,16 @@ def cross(outputPath, l1, l2):
 
 ## part download
 def part_download_go(headers, mainPage, libPath, errorPath, downloadPath, libIndex, pace):
-	try:
-		num_list = get_num_list(libPath)
-		num_list = sorted(num_list)[libIndex: (pace+libIndex)]
-		print('{} nums successfully get from {}'.format(str(pace), libPath))
-	except Exception as e:
-		print(e)
-	try:
-		get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath)
-	except Exception as e:
-		print(e)
+    try:
+        num_list = get_num_list(libPath)
+        num_list = sorted(num_list)[libIndex: (pace+libIndex)]
+        print('{} nums successfully get from {}'.format(str(pace), libPath))
+    except Exception as e:
+        print(e)
+    try:
+        get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath)
+    except Exception as e:
+        print(e)
 
 
 def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, errorPath):
@@ -222,30 +223,58 @@ def get_url_from_numlist_download(num_list, mainPage, headers, downloadPath, err
             image_url_list = []
             get_url(num, image_url_list, mainPage, headers)
             print(str(len(num_list)-num_list.index(num)) + ' left')
-            n = 1
+
             if len(image_url_list) > 5:
                 for url in image_url_list:
-                    download_1pic(downloadPath, num, str(n), url, headers)
-                    n += 1
+                    download_1pic(downloadPath, num, url, headers)
                 print(num + ' done: ' + str(len(image_url_list)) + ' img added.')
-
+            else:
+                print(len(image_url_list))
         except Exception as e:
             error_list.append(num)
             print('get %s failed' % num, e)
     open2a(errorPath, error_list)
 
+def thread_num(num, downloadPath, mainPage, headers):
+    threads = []
+    html_list = html_from_num(num, mainPage, headers)
+    for html in html_list:
+        t = threading.Thread(target=download_1pic, args=(downloadPath, num, html, headers))
+        threads.append(t)
 
+    for i in range(len(html_list)):
+        threads[i].start()
 
-def download_1pic(downloadPath, dirname, filename, html, headers):
-	try:
-		if not os.path.exists(downloadPath + dirname):
-			os.makedirs(downloadPath + dirname)
+    for i in range(len(html_list)):
+        threads[i].join()
+    
 
-		with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
-			result = requests.get(html, headers=headers, timeout = 30)
-			f.write(result.content)
-	except:
-		pass
+def html_from_num(num, mainPage, headers):
+    try:
+        html_list = []
+        get_url(num, html_list, mainPage, headers)
+        print(str(len(html_list)) + ' html get')
+    except Exception as e:
+        print(e)
+        html_list = []
+    return html_list
+
+def download_1pic(downloadPath, dirname, html, headers):
+    try:
+        if not os.path.exists(downloadPath + dirname):
+            os.makedirs(downloadPath + dirname)
+
+        pattern = '/*?([\w]*)\.'
+        filename = re.findall(pattern, html)[-1]
+        with open(downloadPath + '{}\{}.jpg'.format(dirname, filename), 'wb') as f:
+            result = requests.get(html, headers=headers, timeout = 30)        
+            if result.text.find('</html>') == -1:
+                f.write(result.content)
+            else:
+                f.close()
+                os.remove(downloadPath + '{}\{}.jpg'.format(dirname, filename))
+    except:
+        pass
 ##
 
 
